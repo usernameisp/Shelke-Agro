@@ -16,11 +16,11 @@ function App() {
       <ScrollToTop />
       <div className="site-shell">
         <Navbar />
-        <Cart />
         <main className="site-main">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
+            <Route path="/cart" element={<Cart />} />
             <Route path="/products" element={<Products />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/contact" element={<Contact />} />

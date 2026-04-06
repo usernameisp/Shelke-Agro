@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { createPortal } from 'react-dom';
 import {
   FiAlertCircle,
   FiCheckCircle,
@@ -8,11 +7,12 @@ import {
   FiPlus,
   FiShoppingBag,
   FiTrash2,
-  FiX,
 } from 'react-icons/fi';
+import PageHero from './PageHero';
 import { useCart } from '../context/CartContext';
 import { formatCurrency } from '../services/formatters';
 import { emailjsOrderConfig, orderContact } from '../services/orderConfig';
+import { pageImages } from '../services/farmData';
 import {
   buildOrderEmailParams,
   buildOrderProductSummary,
@@ -27,6 +27,8 @@ const initialOrderFormData = {
   deliveryAddress: '',
   notes: '',
 };
+
+const initialCartStep = 'review';
 
 function validateOrderForm(orderFormData) {
   const nextErrors = {};
@@ -55,40 +57,21 @@ function validateOrderForm(orderFormData) {
 }
 
 function Cart() {
-  const { cartItems, cartTotal, closeCart, isCartOpen, removeItem, updateQuantity } = useCart();
+  const { cartItems, cartTotal, removeItem, updateQuantity } = useCart();
   const [orderFormData, setOrderFormData] = useState(initialOrderFormData);
   const [orderErrors, setOrderErrors] = useState({});
   const [orderStatus, setOrderStatus] = useState(null);
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const [activeStep, setActiveStep] = useState(initialCartStep);
   const orderProductSummary = buildOrderProductSummary(cartItems);
   const orderQuantitySummary = buildOrderQuantitySummary(cartItems);
-
-  useEffect(() => {
-    if (!isCartOpen) {
-      return undefined;
-    }
-
-    const handleEscape = (event) => {
-      if (event.key === 'Escape') {
-        closeCart();
-      }
-    };
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    window.addEventListener('keydown', handleEscape);
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener('keydown', handleEscape);
-    };
-  }, [closeCart, isCartOpen]);
 
   useEffect(() => {
     if (cartItems.length > 0) {
       return;
     }
 
+    setActiveStep(initialCartStep);
     setOrderErrors({});
     setOrderStatus(null);
     setIsSubmittingOrder(false);
@@ -216,208 +199,272 @@ function Cart() {
     }
   };
 
-  if (!isCartOpen || typeof document === 'undefined') {
-    return null;
-  }
+  return (
+    <>
+      <PageHero
+        eyebrow="Your Basket"
+        title="Review your selected products and continue to checkout"
+        description="Use this page to verify the products you added, update quantities, remove anything you no longer want, and then continue with order details."
+        image={pageImages.cartHero}
+      />
 
-  return createPortal(
-    <div className="drawer-overlay" role="presentation">
-      <button className="drawer-backdrop" type="button" aria-label="Close cart" onClick={closeCart} />
-      <aside className="cart-drawer" role="dialog" aria-label="Shopping cart" aria-modal="true">
-        <div className="cart-header">
-          <div>
-            <span className="eyebrow">Your basket</span>
-            <h2>Fresh picks in cart</h2>
-          </div>
-          <button className="icon-button" type="button" aria-label="Close cart" onClick={closeCart}>
-            <FiX />
-          </button>
-        </div>
-
-        {cartItems.length === 0 ? (
-          <div className="empty-cart">
-            <div className="empty-cart-icon">
-              <FiShoppingBag />
+      <section className="section section-top-tight">
+        <div className="container">
+          {cartItems.length === 0 ? (
+            <div className="cart-page-shell empty-cart-page">
+              <div className="empty-cart">
+                <div className="empty-cart-icon">
+                  <FiShoppingBag />
+                </div>
+                <h3>Your cart is empty</h3>
+                <p>Add fruit from our latest harvest and then return here to review your basket.</p>
+                <Link className="button button-primary" to="/products">
+                  Browse Products
+                </Link>
+              </div>
             </div>
-            <h3>Your cart is empty</h3>
-            <p>Add fruit from our latest harvest and we will keep the total updated here.</p>
-            <Link className="button button-primary" to="/products" onClick={closeCart}>
-              Browse Products
-            </Link>
-          </div>
-        ) : (
-          <>
-            <div className="cart-items">
-              {cartItems.map((item) => (
-                <article key={item.id} className="cart-item">
-                  <img src={item.image} alt={item.name} loading="lazy" />
-
-                  <div className="cart-item-copy">
-                    <div className="cart-item-top">
-                      <div>
-                        <h3>{item.name}</h3>
-                        <p>
-                          {formatCurrency(item.price)} / {item.unit}
-                        </p>
-                      </div>
-                      <button
-                        className="remove-button"
-                        type="button"
-                        aria-label={`Remove ${item.name}`}
-                        onClick={() => removeItem(item.id)}
-                      >
-                        <FiTrash2 />
-                      </button>
-                    </div>
-
-                    <div className="cart-item-bottom">
-                      <div className="quantity-control quantity-control-small">
-                        <button
-                          className="qty-button"
-                          type="button"
-                          aria-label={`Decrease quantity of ${item.name}`}
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        >
-                          <FiMinus />
-                        </button>
-                        <span>{item.quantity}</span>
-                        <button
-                          className="qty-button"
-                          type="button"
-                          aria-label={`Increase quantity of ${item.name}`}
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        >
-                          <FiPlus />
-                        </button>
-                      </div>
-
-                      <strong>{formatCurrency(item.price * item.quantity)}</strong>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-
-            <div className="cart-summary">
-              <div className="summary-row">
-                <span>Total</span>
-                <strong>{formatCurrency(cartTotal)}</strong>
+          ) : (
+            <div className="cart-page-shell">
+              <div className="cart-header">
+                <div>
+                  <span className="eyebrow">Your basket</span>
+                  <h2>{activeStep === 'checkout' ? 'Fill your order details' : 'Review selected products'}</h2>
+                </div>
+                <Link className="button button-secondary cart-page-link" to="/products">
+                  Continue Shopping
+                </Link>
               </div>
 
-              {orderStatus ? (
-                <div
-                  className={`success-banner order-status-banner${
-                    orderStatus.tone === 'error' ? ' is-error' : ''
-                  }`}
-                >
-                  {orderStatus.tone === 'error' ? <FiAlertCircle /> : <FiCheckCircle />}
-                  <div>
-                    <strong>{orderStatus.title}</strong>
-                    <p>{orderStatus.message}</p>
+              {activeStep === 'review' ? (
+                <>
+                  <div className="cart-selected-header">
+                    <div>
+                      <span className="eyebrow">Selected Products</span>
+                      <h3>{cartItems.length} product{cartItems.length === 1 ? '' : 's'} in your basket</h3>
+                      <p>Review your selected items, update quantities, or remove products before continuing.</p>
+                    </div>
                   </div>
-                </div>
-              ) : null}
 
-              <form className="order-form" onSubmit={handleOrderSubmit} noValidate>
-                <div className="field-grid">
-                  <label className="form-field" htmlFor="name">
-                    <span>Name</span>
-                    <input
-                      id="name"
-                      type="text"
-                      name="customerName"
-                      value={orderFormData.customerName}
-                      onChange={handleOrderFieldChange}
-                      placeholder="Your full name"
-                    />
-                    {orderErrors.customerName ? (
-                      <small className="field-error">{orderErrors.customerName}</small>
+                  <div className="cart-items">
+                    {cartItems.map((item) => (
+                      <article key={item.id} className="cart-item">
+                        <img src={item.image} alt={item.name} loading="lazy" />
+
+                        <div className="cart-item-copy">
+                          <div className="cart-item-top">
+                            <div>
+                              <h3>{item.name}</h3>
+                              <p>
+                                {formatCurrency(item.price)} / {item.unit}
+                              </p>
+                            </div>
+                            <span className="cart-item-quantity">Qty {item.quantity}</span>
+                          </div>
+
+                          <div className="cart-item-bottom">
+                            <strong>{formatCurrency(item.price * item.quantity)}</strong>
+
+                            <div className="cart-item-actions">
+                              <button
+                                className="remove-button"
+                                type="button"
+                                aria-label={`Remove ${item.name}`}
+                                onClick={() => removeItem(item.id)}
+                              >
+                                <FiTrash2 />
+                                <span>Remove</span>
+                              </button>
+                              <div className="quantity-control quantity-control-small">
+                                <button
+                                  className="qty-button"
+                                  type="button"
+                                  aria-label={`Decrease quantity of ${item.name}`}
+                                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                >
+                                  <FiMinus />
+                                </button>
+                                <span>{item.quantity}</span>
+                                <button
+                                  className="qty-button"
+                                  type="button"
+                                  aria-label={`Increase quantity of ${item.name}`}
+                                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                >
+                                  <FiPlus />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+
+                  <div className="cart-review-panel">
+                    <div className="summary-row">
+                      <span>Total</span>
+                      <strong>{formatCurrency(cartTotal)}</strong>
+                    </div>
+
+                    <div className="cart-review-actions">
+                      <button
+                        className="button button-primary"
+                        type="button"
+                        onClick={() => setActiveStep('checkout')}
+                      >
+                        Continue with Details
+                      </button>
+                      <Link className="button button-secondary" to="/products">
+                        Keep Browsing
+                      </Link>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="cart-step-header">
+                    <div>
+                      <span className="eyebrow">Checkout Details</span>
+                      <h3>Continue with form filling</h3>
+                      <p>We have saved your selected products below. Complete the form to place the order.</p>
+                    </div>
+                    <button className="button button-secondary" type="button" onClick={() => setActiveStep('review')}>
+                      Back to Basket
+                    </button>
+                  </div>
+
+                  <div className="cart-checkout-summary">
+                    <div className="checkout-summary-card">
+                      <span>Products</span>
+                      <strong>{orderProductSummary}</strong>
+                    </div>
+                    <div className="checkout-summary-card">
+                      <span>Total quantity</span>
+                      <strong>{orderQuantitySummary}</strong>
+                    </div>
+                    <div className="checkout-summary-card">
+                      <span>Estimated total</span>
+                      <strong>{formatCurrency(cartTotal)}</strong>
+                    </div>
+                  </div>
+
+                  <div className="cart-summary">
+                    {orderStatus ? (
+                      <div
+                        className={`success-banner order-status-banner${
+                          orderStatus.tone === 'error' ? ' is-error' : ''
+                        }`}
+                      >
+                        {orderStatus.tone === 'error' ? <FiAlertCircle /> : <FiCheckCircle />}
+                        <div>
+                          <strong>{orderStatus.title}</strong>
+                          <p>{orderStatus.message}</p>
+                        </div>
+                      </div>
                     ) : null}
-                  </label>
 
-                  <label className="form-field" htmlFor="phone">
-                    <span>Phone Number</span>
-                    <input
-                      id="phone"
-                      type="tel"
-                      name="customerPhone"
-                      value={orderFormData.customerPhone}
-                      onChange={handleOrderFieldChange}
-                      placeholder="+91 98765 43210"
-                    />
-                    {orderErrors.customerPhone ? (
-                      <small className="field-error">{orderErrors.customerPhone}</small>
-                    ) : null}
-                  </label>
-                </div>
+                    <form className="order-form" onSubmit={handleOrderSubmit} noValidate>
+                      <div className="field-grid">
+                        <label className="form-field" htmlFor="name">
+                          <span>Name</span>
+                          <input
+                            id="name"
+                            type="text"
+                            name="customerName"
+                            value={orderFormData.customerName}
+                            onChange={handleOrderFieldChange}
+                            placeholder="Your full name"
+                          />
+                          {orderErrors.customerName ? (
+                            <small className="field-error">{orderErrors.customerName}</small>
+                          ) : null}
+                        </label>
 
-                <label className="form-field" htmlFor="email">
-                  <span>Email</span>
-                  <input
-                    id="email"
-                    type="email"
-                    name="customerEmail"
-                    value={orderFormData.customerEmail}
-                    onChange={handleOrderFieldChange}
-                    placeholder="name@example.com"
-                  />
-                  {orderErrors.customerEmail ? (
-                    <small className="field-error">{orderErrors.customerEmail}</small>
-                  ) : null}
-                </label>
+                        <label className="form-field" htmlFor="phone">
+                          <span>Phone Number</span>
+                          <input
+                            id="phone"
+                            type="tel"
+                            name="customerPhone"
+                            value={orderFormData.customerPhone}
+                            onChange={handleOrderFieldChange}
+                            placeholder="+91 98765 43210"
+                          />
+                          {orderErrors.customerPhone ? (
+                            <small className="field-error">{orderErrors.customerPhone}</small>
+                          ) : null}
+                        </label>
+                      </div>
 
-                <label className="form-field" htmlFor="delivery-address">
-                  <span>Delivery Address</span>
-                  <textarea
-                    id="delivery-address"
-                    name="deliveryAddress"
-                    rows="4"
-                    value={orderFormData.deliveryAddress}
-                    onChange={handleOrderFieldChange}
-                    placeholder="House number, area, city, and any landmark"
-                  />
-                  {orderErrors.deliveryAddress ? (
-                    <small className="field-error">{orderErrors.deliveryAddress}</small>
-                  ) : null}
-                </label>
+                      <label className="form-field" htmlFor="email">
+                        <span>Email</span>
+                        <input
+                          id="email"
+                          type="email"
+                          name="customerEmail"
+                          value={orderFormData.customerEmail}
+                          onChange={handleOrderFieldChange}
+                          placeholder="name@example.com"
+                        />
+                        {orderErrors.customerEmail ? (
+                          <small className="field-error">{orderErrors.customerEmail}</small>
+                        ) : null}
+                      </label>
 
-                <label className="form-field" htmlFor="message">
-                  <span>Message</span>
-                  <textarea
-                    id="message"
-                    name="notes"
-                    rows="3"
-                    value={orderFormData.notes}
-                    onChange={handleOrderFieldChange}
-                    placeholder="Preferred delivery time, ripeness preference, or anything else"
-                  />
-                </label>
+                      <label className="form-field" htmlFor="delivery-address">
+                        <span>Delivery Address</span>
+                        <textarea
+                          id="delivery-address"
+                          name="deliveryAddress"
+                          rows="4"
+                          value={orderFormData.deliveryAddress}
+                          onChange={handleOrderFieldChange}
+                          placeholder="House number, area, city, and any landmark"
+                        />
+                        {orderErrors.deliveryAddress ? (
+                          <small className="field-error">{orderErrors.deliveryAddress}</small>
+                        ) : null}
+                      </label>
 
-                <input id="product" name="product" type="hidden" value={orderProductSummary} readOnly />
-                <input id="quantity" name="quantity" type="hidden" value={orderQuantitySummary} readOnly />
+                      <label className="form-field" htmlFor="message">
+                        <span>Message</span>
+                        <textarea
+                          id="message"
+                          name="notes"
+                          rows="3"
+                          value={orderFormData.notes}
+                          onChange={handleOrderFieldChange}
+                          placeholder="Preferred delivery time, ripeness preference, or anything else"
+                        />
+                      </label>
 
-                <div className="order-actions">
-                  <button className="button button-primary" type="submit" disabled={isSubmittingOrder}>
-                    {isSubmittingOrder ? 'Sending Order...' : 'Submit Order'}
-                  </button>
-                  <button
-                    className="button button-secondary"
-                    type="button"
-                    onClick={() => window.open(orderContact.whatsappHref, '_blank', 'noopener,noreferrer')}
-                  >
-                    Open WhatsApp
-                  </button>
-                  <Link className="button button-secondary" to="/contact" onClick={closeCart}>
-                    Need Help?
-                  </Link>
-                </div>
-              </form>
+                      <input id="product" name="product" type="hidden" value={orderProductSummary} readOnly />
+                      <input id="quantity" name="quantity" type="hidden" value={orderQuantitySummary} readOnly />
+
+                      <div className="order-actions">
+                        <button className="button button-primary" type="submit" disabled={isSubmittingOrder}>
+                          {isSubmittingOrder ? 'Sending Order...' : 'Submit Order'}
+                        </button>
+                        <button
+                          className="button button-secondary"
+                          type="button"
+                          onClick={() => window.open(orderContact.whatsappHref, '_blank', 'noopener,noreferrer')}
+                        >
+                          Open WhatsApp
+                        </button>
+                        <Link className="button button-secondary" to="/contact">
+                          Need Help?
+                        </Link>
+                      </div>
+                    </form>
+                  </div>
+                </>
+              )}
             </div>
-          </>
-        )}
-      </aside>
-    </div>,
-    document.body,
+          )}
+        </div>
+      </section>
+    </>
   );
 }
 

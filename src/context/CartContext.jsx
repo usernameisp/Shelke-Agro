@@ -27,15 +27,10 @@ function getInitialCart() {
 
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState(getInitialCart);
-  const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
     window.sessionStorage.setItem(storageKey, JSON.stringify(cartItems));
   }, [cartItems]);
-
-  const openCart = () => setIsCartOpen(true);
-  const closeCart = () => setIsCartOpen(false);
-  const toggleCart = () => setIsCartOpen((currentState) => !currentState);
 
   const removeItem = (itemId) => {
     setCartItems((currentItems) => currentItems.filter((item) => item.id !== itemId));
@@ -99,11 +94,7 @@ export function CartProvider({ children }) {
     cartCount,
     cartItems,
     cartTotal,
-    closeCart,
-    isCartOpen,
-    openCart,
     removeItem,
-    toggleCart,
     updateQuantity,
   };
 

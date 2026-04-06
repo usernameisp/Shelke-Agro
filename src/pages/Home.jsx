@@ -26,15 +26,19 @@ const iconMap = {
 
 function Home() {
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addToCart, cartItems } = useCart();
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const featuredProducts = products.slice(0, 4);
 
   useEffect(() => {
     if (selectedProduct) {
       setQuantity(1);
     }
   }, [selectedProduct]);
+
+  const getCartQuantity = (productId) =>
+    cartItems.find((item) => item.id === productId)?.quantity ?? 0;
 
   const handleAddToCart = () => {
     if (!selectedProduct) {
@@ -134,13 +138,14 @@ function Home() {
           <SectionIntro
             eyebrow="Curated Harvest"
             title="Exceptional Offerings"
-            description="Explore our selection of premium organic produce, grown with care and delivered fresh."
+            description="Discover four featured fruits here, then visit the products page to browse the full catalog."
           />
 
           <div className="product-grid">
-            {products.map((product) => (
+            {featuredProducts.map((product) => (
               <ProductCard
                 key={product.id}
+                cartQuantity={getCartQuantity(product.id)}
                 product={product}
                 onOrder={() => handleOrderNow(product)}
                 actionLabel="View Details"
@@ -152,6 +157,7 @@ function Home() {
       </section>
 
       <ProductQuickViewModal
+        cartQuantity={selectedProduct ? getCartQuantity(selectedProduct.id) : 0}
         product={selectedProduct}
         quantity={quantity}
         onClose={() => setSelectedProduct(null)}

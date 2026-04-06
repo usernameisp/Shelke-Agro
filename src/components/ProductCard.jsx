@@ -1,13 +1,16 @@
-import { FiArrowRight } from 'react-icons/fi';
+import { FiArrowRight, FiCheck } from 'react-icons/fi';
 import { formatCurrency } from '../services/formatters';
 
 function ProductCard({
+  cartQuantity = 0,
   product,
   onOrder,
   onViewDetails,
   actionLabel = 'View Details',
   orderLabel = 'Order Now',
 }) {
+  const isInCart = cartQuantity > 0;
+
   const handleCardKeyDown = (event) => {
     if (!onViewDetails) {
       return;
@@ -61,12 +64,21 @@ function ProductCard({
               {tag}
             </span>
           ))}
+          {isInCart ? <span className="pill pill-accent">In basket: {cartQuantity}</span> : null}
         </div>
 
         <div className="product-card-actions">
           {onOrder ? (
-            <button className="button button-primary product-order-button" type="button" onClick={handleOrderClick}>
-              {orderLabel}
+            <button
+              className={`button ${isInCart ? 'button-secondary' : 'button-primary'} product-order-button${
+                isInCart ? ' is-added' : ''
+              }`}
+              type="button"
+              onClick={handleOrderClick}
+              disabled={isInCart}
+            >
+              {isInCart ? <FiCheck /> : null}
+              {isInCart ? 'Added to Cart' : orderLabel}
             </button>
           ) : null}
 

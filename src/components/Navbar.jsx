@@ -9,7 +9,7 @@ import { companyInfo, navLinks } from '../services/farmData';
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { pathname } = useLocation();
-  const { cartCount, openCart } = useCart();
+  const { cartCount } = useCart();
 
   useEffect(() => {
     setIsMenuOpen(false);
@@ -34,11 +34,11 @@ function Navbar() {
           </nav>
 
           <div className="nav-actions">
-            <button className="cart-button" type="button" aria-label="Open cart" onClick={openCart}>
+            <Link className="cart-button" to="/cart" aria-label="Open cart page">
               <FiShoppingBag />
               <span>Cart</span>
               <span className="cart-count">{cartCount}</span>
-            </button>
+            </Link>
 
             <Link className="button button-primary nav-cta" to="/products">
               Explore Harvest

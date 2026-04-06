@@ -115,8 +115,8 @@ function Contact() {
           <div className="contact-panel">
             <SectionIntro
               eyebrow="Contact details"
-              title="Reach the farm desk directly"
-              description="Use the contact form for a message, or connect with us using the details below."
+              title="Reach our team directly"
+              description="Use the contact form for a message, or connect with us using the office details below."
             />
 
             <div className="contact-card-grid">
@@ -149,7 +149,7 @@ function Contact() {
                 <FiCheckCircle />
                 <div>
                   <strong>WhatsApp opened successfully</strong>
-                  <p>Your message is ready in WhatsApp. Review it there and tap send to contact the farm team.</p>
+                  <p>Your message is ready in WhatsApp. Review it there and tap send to contact our team.</p>
                 </div>
               </div>
             ) : null}
@@ -241,7 +241,7 @@ function Contact() {
                 <p>{contactSupport.whatsappDescription}</p>
               </article>
               <article className="contact-support-card">
-                <span className="eyebrow">Visit Our Farm</span>
+                <span className="eyebrow">Visit Our Office</span>
                 <h3>{contactSupport.visitTitle}</h3>
                 <p>{contactSupport.visitDescription}</p>
                 <p className="visit-note">{contactSupport.visitNote}</p>
@@ -256,13 +256,13 @@ function Contact() {
           <div className="map-card">
             <div className="map-copy">
               <span className="eyebrow">Find us</span>
-              <h2>Shelke Organic Farm Desk</h2>
+              <h2>Shelke Group Pune Office</h2>
               <p>{companyInfo.address}</p>
             </div>
 
             <iframe
               src={companyInfo.mapEmbedUrl}
-              title="Shelke Organic Farm location map"
+              title="Shelke Group Pune office location map"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             />

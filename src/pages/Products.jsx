@@ -9,13 +9,16 @@ import { pageImages, products } from '../services/farmData';
 function Products() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const { addToCart } = useCart();
+  const { addToCart, cartItems } = useCart();
 
   useEffect(() => {
     if (selectedProduct) {
       setQuantity(1);
     }
   }, [selectedProduct]);
+
+  const getCartQuantity = (productId) =>
+    cartItems.find((item) => item.id === productId)?.quantity ?? 0;
 
   const handleAddToCart = () => {
     if (!selectedProduct) {
@@ -51,6 +54,7 @@ function Products() {
             {products.map((product) => (
               <ProductCard
                 key={product.id}
+                cartQuantity={getCartQuantity(product.id)}
                 product={product}
                 onOrder={() => handleOrderNow(product)}
                 onViewDetails={() => setSelectedProduct(product)}
@@ -61,6 +65,7 @@ function Products() {
       </section>
 
       <ProductQuickViewModal
+        cartQuantity={selectedProduct ? getCartQuantity(selectedProduct.id) : 0}
         product={selectedProduct}
         quantity={quantity}
         onClose={() => setSelectedProduct(null)}

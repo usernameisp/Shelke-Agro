@@ -3,6 +3,7 @@ import { formatCurrency } from '../services/formatters';
 import ModalShell from './ModalShell';
 
 function ProductQuickViewModal({
+  cartQuantity = 0,
   product,
   quantity,
   onAddToCart,
@@ -10,6 +11,8 @@ function ProductQuickViewModal({
   onDecreaseQuantity,
   onIncreaseQuantity,
 }) {
+  const isInCart = cartQuantity > 0;
+
   return (
     <ModalShell
       isOpen={Boolean(product)}
@@ -56,6 +59,7 @@ function ProductQuickViewModal({
                   {tag}
                 </span>
               ))}
+              {isInCart ? <span className="pill">In basket: {cartQuantity}</span> : null}
             </div>
 
             <div className="product-modal-actions">
@@ -81,7 +85,7 @@ function ProductQuickViewModal({
 
               <button className="button button-primary" type="button" onClick={onAddToCart}>
                 <FiShoppingBag />
-                Add to Cart
+                {isInCart ? 'Add More to Cart' : 'Add to Cart'}
               </button>
             </div>
           </div>
