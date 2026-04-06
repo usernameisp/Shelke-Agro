@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.sixth/
+*.log
+logo.png
+logo-full-clean-preview.png
+logo-on-footer-preview.png
+rendered_home.html
+wix_*.html
+wix_*.js
+wix_*.txt
+wix_slug.css
