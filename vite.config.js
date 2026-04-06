@@ -2,6 +2,13 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ command }) => ({
-  base: command === 'build' ? '/Shelke-Agro/' : '/',
+  base: command === 'build' ? '/Shelke-Agro/site/' : '/',
+  build: {
+    emptyOutDir: true,
+    outDir: 'site',
+    rollupOptions: {
+      input: 'app.html',
+    },
+  },
   plugins: [react()],
 }));
