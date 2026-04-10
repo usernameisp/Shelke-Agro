@@ -37,8 +37,8 @@ function Products() {
     <>
       <PageHero
         eyebrow="Our Products"
-        title="Premium organic produce, grown with care and delivered fresh"
-        description="Explore our selection of premium fruits, harvested thoughtfully and shared at peak quality."
+        title="Four premium organic fruits, grown with care and delivered fresh"
+        description="Browse our focused fruit collection of grapes, banana, jambhul, and Keshar Amba."
         image={pageImages.productsHero}
       />
 
@@ -46,8 +46,8 @@ function Products() {
         <div className="container">
           <SectionIntro
             eyebrow="Curated Harvest"
-            title="Our premium organic selection"
-            description="Browse the fruits currently featured in our catalog and open any item to view more details."
+            title="Our four-fruit organic selection"
+            description="Open any fruit to view more details, pricing, and storage guidance."
           />
 
           <div className="product-grid">

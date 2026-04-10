@@ -138,7 +138,7 @@ function Home() {
           <SectionIntro
             eyebrow="Curated Harvest"
             title="Exceptional Offerings"
-            description="Discover four featured fruits here, then visit the products page to browse the full catalog."
+            description="Discover the complete four-fruit lineup featured on the website and open any item for more detail."
           />
 
           <div className="product-grid">

@@ -3,7 +3,7 @@ import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import ModalShell from '../components/ModalShell';
 import PageHero from '../components/PageHero';
 import SectionIntro from '../components/SectionIntro';
-import { galleryImages, pageImages } from '../services/farmData';
+import { featuredVideos, galleryImages, pageImages } from '../services/farmData';
 
 function Gallery() {
   const [activeIndex, setActiveIndex] = useState(null);
@@ -25,8 +25,8 @@ function Gallery() {
     <>
       <PageHero
         eyebrow="Our Gallery"
-        title="Explore the beauty of our farm"
-        description="A visual collection that captures the essence of sustainable agriculture and daily life at Shelke Organic Farm."
+        title="Explore the farm and fruit collection"
+        description="A visual collection focused on our four featured fruits and the farming work behind them."
         image={pageImages.galleryHero}
       />
 
@@ -34,8 +34,8 @@ function Gallery() {
         <div className="container">
           <SectionIntro
             eyebrow="Visual Essay"
-            title="Glimpses of life, growth, and beauty from within the farm"
-            description="Open any image for a larger look at the people, produce, and processes behind our harvests."
+            title="Photos from the field and the featured harvest"
+            description="Open any image for a larger look at the fruits, people, and farming work shown across the website."
           />
 
           <div className="gallery-grid">
@@ -54,6 +54,43 @@ function Gallery() {
                   <p>{image.description}</p>
                 </div>
               </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section section-top-tight">
+        <div className="container">
+          <SectionIntro
+            eyebrow="Video Gallery"
+            title="Fruit moments in motion"
+            description="Watch a few short fruit clips that complement the photo gallery."
+          />
+
+          <div className="video-gallery-grid">
+            {featuredVideos.map((video) => (
+              <article key={video.id} className="video-gallery-card">
+                <div className="video-frame">
+                  <video
+                    controls
+                    controlsList="nodownload noremoteplayback"
+                    disablePictureInPicture
+                    playsInline
+                    preload="metadata"
+                    poster={video.poster}
+                    onContextMenu={(event) => event.preventDefault()}
+                  >
+                    <source src={video.videoUrl} type="video/mp4" />
+                    Your browser does not support HTML5 video.
+                  </video>
+                </div>
+
+                <div className="video-gallery-copy">
+                  <span className="gallery-label">Video highlight</span>
+                  <h3>{video.title}</h3>
+                  <p>{video.description}</p>
+                </div>
+              </article>
             ))}
           </div>
         </div>
