@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { FiMail, FiMapPin, FiPhone } from 'react-icons/fi';
-import logo from '../assets/logo.png';
+import logo from '../../logo2-transparent.png';
 import { companyInfo, navLinks } from '../services/farmData';
 
 function Footer() {

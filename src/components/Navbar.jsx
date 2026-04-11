@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { FiArrowRight, FiShoppingBag } from 'react-icons/fi';
 import { HiBars3, HiXMark } from 'react-icons/hi2';
-import logo from '../assets/logo.png';
+import logo from '../../logo2-transparent.png';
 import { useCart } from '../context/CartContext';
 import { companyInfo, navLinks } from '../services/farmData';
 
